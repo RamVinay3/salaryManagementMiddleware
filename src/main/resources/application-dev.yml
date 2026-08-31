@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: ${LOCAL_ORACLE_URL}
+    username: ${LOCAL_ORACLE_USERNAME}
+    password: ${LOCAL_ORACLE_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
