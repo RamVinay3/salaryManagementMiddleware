@@ -1,6 +1,11 @@
 package com.vinay.salaryManagement.service;
 
+import com.vinay.salaryManagement.dto.request.SalaryUpdateRequest;
+import com.vinay.salaryManagement.dto.response.SalaryResponse;
+import com.vinay.salaryManagement.entity.Employee;
 import com.vinay.salaryManagement.entity.Salary;
+import com.vinay.salaryManagement.mapper.SalaryMapper;
+import com.vinay.salaryManagement.repositories.EmployeeRepository;
 import com.vinay.salaryManagement.repositories.SalaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,17 +15,41 @@ import org.springframework.stereotype.Service;
 public class SalaryService {
 
     private final SalaryRepository salaryRepository;
+    private final SalaryMapper salaryMapper;
+    private final EmployeeRepository employeeRepository;
 
-    public Salary getCurrentSalary(Long employeeId) {
-        return salaryRepository
+    public SalaryResponse createSalary(
+            Long employeeId,
+            SalaryUpdateRequest request
+    ) {
+        Employee employee = employeeRepository
+                .findById(employeeId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Employee not found: " + employeeId
+                        )
+                );
+
+        Salary salary = salaryMapper.toEntity(
+                request,
+                employee
+        );
+
+        Salary savedSalary =
+                salaryRepository.save(salary);
+
+        return salaryMapper.toResponse(savedSalary);
+    }
+    public SalaryResponse getCurrentSalary(Long employeeId) {
+        Salary salary= salaryRepository
                 .findTopByEmployeeIdOrderByEffectiveDateDesc(employeeId)
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Salary not found for employee: " + employeeId
                         ));
+
+        return salaryMapper.toResponse(salary);
     }
 
-    public Salary saveSalary(Salary salary) {
-        return salaryRepository.save(salary);
-    }
+
 }
