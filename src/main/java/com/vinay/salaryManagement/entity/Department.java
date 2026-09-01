@@ -15,14 +15,14 @@ import lombok.*;
 public class Department {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-    generator = "department_seq")
-    @SequenceGenerator(name = "department_seq",
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator="DEPARTMENT_SEQ")
+    @SequenceGenerator(name = "DEPARTMENT_SEQ",
                         allocationSize = 1,
-                        sequenceName ="department_seq" )
+                        sequenceName ="DEPARTMENT_SEQ" )
     private Long id;
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
+    private String description;
 
 }

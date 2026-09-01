@@ -1,14 +1,26 @@
-package com.vinay.salaryManagement.Exception;
+package com.vinay.salaryManagement.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleEmployeeNotFound(
+            Exception exception
+    ) {
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage()
+        );
+    }
 
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEmployeeNotFound(
@@ -54,6 +66,22 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(response);
     }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            MethodArgumentNotValidException exception
+    ) {
+        String message = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error ->
+                        error.getField() + ": " + error.getDefaultMessage()
+                )
+                .collect(Collectors.joining(", "));
 
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                message
+        );
+    }
 
 }

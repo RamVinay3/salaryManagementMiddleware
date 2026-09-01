@@ -10,6 +10,12 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "salary",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_salary_employee_effective_date",
+                        columnNames = {"employee_id", "effective_date"}
+                )
+        },
         indexes = {
                 @Index(
                         name = "idx_salary_employee_effective",
@@ -30,6 +36,7 @@ public class Salary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "SALARY_SEQ",allocationSize = 1,sequenceName ="SALARY_SEQ" )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -1,6 +1,11 @@
 package com.vinay.salaryManagement.service;
 
+import com.vinay.salaryManagement.dto.request.DepartmentCreateRequest;
+import com.vinay.salaryManagement.dto.response.DepartmentResponse;
+import com.vinay.salaryManagement.dto.request.DepartmentUpdateRequest;
 import com.vinay.salaryManagement.entity.Department;
+import com.vinay.salaryManagement.exception.DepartmentNotFoundException;
+import com.vinay.salaryManagement.mapper.DepartmentMapper;
 import com.vinay.salaryManagement.repositories.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,17 +17,79 @@ import java.util.List;
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
+    private final DepartmentMapper departmentMapper;
+
+    public List<DepartmentResponse> getAllDepartments() {
+
+        return departmentRepository.findAll()
+                .stream()
+                .map(departmentMapper::toResponse)
+                .toList();
     }
 
-    public Department getDepartmentById(Long id) {
-        return departmentRepository.findById(id)
+    public DepartmentResponse getDepartmentById(Long id) {
+
+        Department department = departmentRepository
+                .findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Department not found: " + id));
+                        new DepartmentNotFoundException(id)
+                );
+
+        return departmentMapper.toResponse(department);
     }
 
-    public Department saveDepartment(Department department) {
-        return departmentRepository.save(department);
+    public DepartmentResponse createDepartment(
+            DepartmentCreateRequest request
+    ) {
+
+        if (departmentRepository.existsByNameIgnoreCase(
+                request.getName()
+        )) {
+            throw new IllegalArgumentException(
+                    "Department already exists: "
+                            + request.getName()
+            );
+        }
+
+        Department department =
+                departmentMapper.toEntity(request);
+
+        Department savedDepartment =
+                departmentRepository.save(department);
+
+        return departmentMapper.toResponse(savedDepartment);
+    }
+
+    public DepartmentResponse updateDepartment(
+            Long id,
+            DepartmentUpdateRequest request
+    ) {
+
+        Department department = departmentRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new DepartmentNotFoundException(id)
+                );
+
+        departmentMapper.updateEntity(
+                department,
+                request
+        );
+
+        Department updatedDepartment =
+                departmentRepository.save(department);
+
+        return departmentMapper.toResponse(updatedDepartment);
+    }
+
+    public void deleteDepartment(Long id) {
+
+        Department department = departmentRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new DepartmentNotFoundException(id)
+                );
+
+        departmentRepository.delete(department);
     }
 }

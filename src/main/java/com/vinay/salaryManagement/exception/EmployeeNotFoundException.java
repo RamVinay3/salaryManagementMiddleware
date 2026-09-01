@@ -1,4 +1,4 @@
-package com.vinay.salaryManagement.Exception;
+package com.vinay.salaryManagement.exception;
 
 public class EmployeeNotFoundException extends RuntimeException{
 

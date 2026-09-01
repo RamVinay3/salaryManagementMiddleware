@@ -1,5 +1,7 @@
 package com.vinay.salaryManagement.service;
 
+import com.vinay.salaryManagement.exception.EmployeeNotFoundException;
+import com.vinay.salaryManagement.exception.SalaryNotFoundException;
 import com.vinay.salaryManagement.dto.request.SalaryUpdateRequest;
 import com.vinay.salaryManagement.dto.response.SalaryResponse;
 import com.vinay.salaryManagement.entity.Employee;
@@ -25,8 +27,8 @@ public class SalaryService {
         Employee employee = employeeRepository
                 .findById(employeeId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Employee not found: " + employeeId
+                        new EmployeeNotFoundException(
+                                 employeeId
                         )
                 );
 
@@ -44,9 +46,7 @@ public class SalaryService {
         Salary salary= salaryRepository
                 .findTopByEmployeeIdOrderByEffectiveDateDesc(employeeId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Salary not found for employee: " + employeeId
-                        ));
+                        new SalaryNotFoundException( employeeId ));
 
         return salaryMapper.toResponse(salary);
     }

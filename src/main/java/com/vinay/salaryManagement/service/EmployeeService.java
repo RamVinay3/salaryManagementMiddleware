@@ -1,5 +1,7 @@
 package com.vinay.salaryManagement.service;
 
+import com.vinay.salaryManagement.exception.DepartmentNotFoundException;
+import com.vinay.salaryManagement.exception.EmployeeNotFoundException;
 import com.vinay.salaryManagement.dto.request.EmployeeCreateRequest;
 import com.vinay.salaryManagement.dto.request.EmployeeUpdateRequest;
 import com.vinay.salaryManagement.dto.response.EmployeeResponse;
@@ -21,14 +23,27 @@ public class EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final DepartmentRepository departmentRepository;
 
-    public Page<EmployeeResponse> getEmployees(Pageable pageable) {
-        return employeeRepository.findAll(pageable).map(employeeMapper::toResponse);
+    public Page<EmployeeResponse> getEmployees(
+            Long departmentId,
+            String country,
+            String search,
+            Pageable pageable
+    ) {
+
+        System.out.println("departmentId= "+departmentId+" country= "+country+" search= "+search);
+        return employeeRepository.searchEmployees(
+                        departmentId,
+                        country,
+                        search,
+                        pageable
+                )
+                .map(employeeMapper::toResponse);
     }
 
     public EmployeeResponse getEmployeeById(Long id) {
         Employee employee= employeeRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Employee not found: " + id));
+                        new EmployeeNotFoundException(id));
 
         return employeeMapper.toResponse(employee);
     }
@@ -53,24 +68,13 @@ public class EmployeeService {
         ).map(employeeMapper::toResponse);
     }
 
-    public Page<EmployeeResponse> getEmployeesByCountry(
-            String country,
-            Pageable pageable
-    ) {
-        return employeeRepository.findByCountry(
-                country,
-                pageable
-        ).map(employeeMapper::toResponse);
-    }
+    public void deleteEmployee(Long id) {
 
-    public Page<EmployeeResponse> searchEmployees(
-            String lastName,
-            Pageable pageable
-    ) {
-        return employeeRepository.findByLastNameContainingIgnoreCase(
-                lastName,
-                pageable
-        ).map(employeeMapper::toResponse);
+        if (!employeeRepository.existsById(id)) {
+            throw new EmployeeNotFoundException(id);
+        }
+
+        employeeRepository.deleteById(id);
     }
 
     public EmployeeResponse saveEmployee(EmployeeCreateRequest request) {
@@ -78,10 +82,7 @@ public class EmployeeService {
         Department department = departmentRepository
                 .findById(request.getDepartmentId())
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Department not found: "
-                                        + request.getDepartmentId()
-                        )
+                        new DepartmentNotFoundException(request.getDepartmentId())
                 );
         Employee employee1= employeeRepository.save(employeeMapper.toEntity(request,department));
         return employeeMapper.toResponse(employee1);
@@ -92,10 +93,7 @@ public class EmployeeService {
         Department department = departmentRepository
                 .findById(request.getDepartmentId())
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Department not found: "
-                                        + request.getDepartmentId()
-                        )
+                        new DepartmentNotFoundException(request.getDepartmentId())
                 );
 
         Employee employee = employeeMapper.toEntity(
@@ -115,17 +113,14 @@ public class EmployeeService {
     ) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Employee not found: " + id
-                        )
+                        new EmployeeNotFoundException(id)
                 );
 
         Department department = departmentRepository
                 .findById(request.getDepartmentId())
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Department not found: "
-                                        + request.getDepartmentId()
+                        new DepartmentNotFoundException(
+                               request.getDepartmentId()
                         )
                 );
 
