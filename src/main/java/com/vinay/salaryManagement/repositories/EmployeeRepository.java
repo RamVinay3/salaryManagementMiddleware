@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee,Long> {
@@ -33,4 +34,26 @@ public interface EmployeeRepository extends JpaRepository<Employee,Long> {
             @Param("search") String search,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT COUNT(e)
+        FROM Employee e
+        """)
+    Long countEmployees();
+
+    @Query("""
+        SELECT e.country, COUNT(e)
+        FROM Employee e
+        GROUP BY e.country
+        ORDER BY COUNT(e) DESC
+        """)
+    List<Object[]> countEmployeesByCountry();
+
+    @Query("""
+        SELECT e.department.name, COUNT(e)
+        FROM Employee e
+        GROUP BY e.department.name
+        ORDER BY COUNT(e) DESC
+        """)
+    List<Object[]> countEmployeesByDepartment();
 }
