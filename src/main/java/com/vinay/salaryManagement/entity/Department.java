@@ -23,6 +23,7 @@ public class Department {
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
+    @Column(name = "description")
     private String description;
 
 }
