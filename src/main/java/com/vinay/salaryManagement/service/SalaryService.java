@@ -43,6 +43,12 @@ public class SalaryService {
         return salaryMapper.toResponse(savedSalary);
     }
     public SalaryResponse getCurrentSalary(Long employeeId) {
+
+        boolean employeeFound = employeeRepository.existsById(employeeId);
+
+        if(!employeeFound) {
+            throw new EmployeeNotFoundException(employeeId);
+        }
         Salary salary= salaryRepository
                 .findTopByEmployeeIdOrderByEffectiveDateDesc(employeeId)
                 .orElseThrow(() ->
