@@ -20,6 +20,7 @@ public interface EmployeeRepository extends JpaRepository<Employee,Long> {
     @Query("""
             SELECT e
             FROM Employee e
+            JOIN FETCH e.department
             WHERE (:departmentId IS NULL OR e.department.id = :departmentId)
               AND (:country IS NULL OR e.country = :country)
               AND (
@@ -56,4 +57,11 @@ public interface EmployeeRepository extends JpaRepository<Employee,Long> {
         ORDER BY COUNT(e) DESC
         """)
     List<Object[]> countEmployeesByDepartment();
+
+    @Query("""
+       SELECT e
+       FROM Employee e
+       JOIN FETCH e.department
+       """)
+    List<Employee> findAllEmployeesWithDepartment();
 }

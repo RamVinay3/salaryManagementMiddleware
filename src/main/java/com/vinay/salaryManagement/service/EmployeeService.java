@@ -1,5 +1,6 @@
 package com.vinay.salaryManagement.service;
 
+import com.vinay.salaryManagement.dto.common.PageResponse;
 import com.vinay.salaryManagement.exception.DepartmentNotFoundException;
 import com.vinay.salaryManagement.exception.EmployeeNotFoundException;
 import com.vinay.salaryManagement.dto.request.EmployeeCreateRequest;
@@ -8,12 +9,15 @@ import com.vinay.salaryManagement.dto.response.EmployeeResponse;
 import com.vinay.salaryManagement.entity.Department;
 import com.vinay.salaryManagement.entity.Employee;
 import com.vinay.salaryManagement.mapper.EmployeeMapper;
+import com.vinay.salaryManagement.mapper.PageMapper;
 import com.vinay.salaryManagement.repositories.DepartmentRepository;
 import com.vinay.salaryManagement.repositories.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +26,26 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
     private final DepartmentRepository departmentRepository;
+    private final PageMapper pageMapper;
 
-    public Page<EmployeeResponse> getEmployees(
+    public PageResponse<EmployeeResponse> getEmployees(
             Long departmentId,
             String country,
             String search,
             Pageable pageable
     ) {
 
+
         System.out.println("departmentId= "+departmentId+" country= "+country+" search= "+search);
-        return employeeRepository.searchEmployees(
+        Page<EmployeeResponse> employees = employeeRepository.searchEmployees(
                         departmentId,
                         country,
                         search,
                         pageable
-                )
-                .map(employeeMapper::toResponse);
+                ).map(employeeMapper::toResponse);
+
+        return pageMapper.toPageResponse(employees);
+
     }
 
     public EmployeeResponse getEmployeeById(Long id) {

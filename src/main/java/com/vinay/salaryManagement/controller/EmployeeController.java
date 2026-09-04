@@ -1,5 +1,6 @@
 package com.vinay.salaryManagement.controller;
 
+import com.vinay.salaryManagement.dto.common.PageResponse;
 import com.vinay.salaryManagement.dto.request.EmployeeCreateRequest;
 import com.vinay.salaryManagement.dto.response.EmployeeResponse;
 import com.vinay.salaryManagement.dto.request.EmployeeUpdateRequest;
@@ -21,7 +22,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public ResponseEntity<Page<EmployeeResponse>> getEmployees(
+    public ResponseEntity<PageResponse<EmployeeResponse>> getEmployees(
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String search,
