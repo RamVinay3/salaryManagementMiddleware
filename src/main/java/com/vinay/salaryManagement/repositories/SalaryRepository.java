@@ -11,6 +11,7 @@ public interface SalaryRepository extends JpaRepository<Salary,Long> {
     Optional<Salary> findTopByEmployeeIdOrderByEffectiveDateDesc(
             Long employeeId
     );
+   Optional< List<Salary> >findByEmployeeId(Long employeeId);
 
     @Query("""
         SELECT s.currency, AVG(s.amount)

@@ -12,6 +12,9 @@ import com.vinay.salaryManagement.repositories.SalaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class SalaryService {
@@ -55,6 +58,20 @@ public class SalaryService {
                         new SalaryNotFoundException( employeeId ));
 
         return salaryMapper.toResponse(salary);
+    }
+
+    public List<SalaryResponse> getSalaryHistory(Long employeeId) {
+
+        boolean employeeFound = employeeRepository.existsById(employeeId);
+
+        if(!employeeFound) {
+            throw new EmployeeNotFoundException(employeeId);
+        }
+        List<Salary> salary= salaryRepository.findByEmployeeId(employeeId)
+                .orElseThrow(() ->
+                        new SalaryNotFoundException( employeeId ));
+
+        return salary.stream().map(salaryMapper::toResponse).toList();
     }
 
 

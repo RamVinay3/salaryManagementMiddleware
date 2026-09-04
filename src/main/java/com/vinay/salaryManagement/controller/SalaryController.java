@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/employees/{employeeId}/salary")
 @RequiredArgsConstructor
@@ -33,6 +35,16 @@ public class SalaryController {
         SalaryResponse response =
                 salaryService.createSalary(employeeId, request);
 
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<SalaryResponse>> salaryHistory(@PathVariable Long employeeId){
+
+        List<SalaryResponse> response =
+                salaryService.getSalaryHistory(employeeId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
