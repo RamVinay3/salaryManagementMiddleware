@@ -18,4 +18,5 @@ public class StatisticsResponse {
     private List<EmployeeCountByDepartment> employeesByDepartment;
 
     private List<AverageSalaryByCurrency> averageSalaryByCurrency;
+    private List<SalaryStatisticsByCountry> salaryStatisticsByCountry;
 }

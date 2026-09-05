@@ -34,4 +34,24 @@ public interface SalaryRepository extends JpaRepository<Salary,Long> {
         """)
     List<Object[]> findAverageCurrentSalaryByCurrency();
 
+
+    @Query("""
+    SELECT
+        s.employee.id,
+        s.employee.employeeCode,
+        s.employee.firstName,
+        s.employee.lastName,
+        s.employee.country,
+        s.currency,
+        s.amount
+    FROM Salary s
+    WHERE s.effectiveDate = (
+        SELECT MAX(s2.effectiveDate)
+        FROM Salary s2
+        WHERE s2.employee.id = s.employee.id
+    )
+    ORDER BY s.employee.country, s.currency, s.amount DESC
+    """)
+    List<Object[]> findCurrentSalaryDetails();
+
 }
