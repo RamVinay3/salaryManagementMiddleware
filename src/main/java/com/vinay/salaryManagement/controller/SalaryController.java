@@ -46,7 +46,8 @@ public class SalaryController {
         List<SalaryResponse> response =
                 salaryService.getSalaryHistory(employeeId);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(response);
     }
+
 }
